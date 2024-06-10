@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    {% for profile in profiles %}
+    <div class="card mb-4">
+        <div class="card-header text-center">
+            <h2>{{ profile.user.first_name }} {{ profile.user.last_name }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle">
+                    {% else %}
+                        <img src="{% static 'user_profiles/img/default_profile_picture.jpg' %}" alt="Default Profile Picture" class="img-fluid rounded-circle">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <p><strong>Email:</strong> {{ profile.user.email }}</p>
+                    <p><strong>Bio:</strong> {{ profile.bio|default:'-' }}</p>
+                    <p><strong>Gender:</strong> {{ profile.gender|default:'-' }}</p>
+                    <p><strong>Date of Birth:</strong> {{ profile.date_of_birth|date:'Y-m-d'|default:'-' }}</p>
+                    <p><strong>Address:</strong> {{ profile.address|default:'-' }}</p>
+                    <p><strong>Phone Number:</strong> {{ profile.phone_number|default:'-' }}</p>
+                    <p><strong>Skills:</strong>
+                        {% if profile.skills %}
+                            {% for skill in profile.skills %}
+                                {{ skill.skill_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <h5>Projects:</h5>
+                    {% if profile.projects %}
+                        <ul>
+                            {% for project in profile.projects %}
+                                <li>
+                                    <a href="{{ project.link }}" target="_blank">
+                                        <h6>{{ project.title }}</h6>
+                                    </a>
+                                    <p>{{ project.description }}</p>
+                                    {% if project.image %}
+                                        <a href="{{ project.link }}" target="_blank">
+                                            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="img-fluid" style="max-width: 200px; max-height: 150px;">
+                                        </a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                    <h5>Work Experience:</h5>
+                    {% if profile.work_experiences %}
+                        <ul>
+                            {% for work_experience in profile.work_experiences %}
+                                <li>{{ work_experience.position }} at {{ work_experience.company }} ({{ work_experience.start_date|date:'Y-m-d' }} - {{ work_experience.end_date|date:'Y-m-d'|default:'Present' }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                    <h5>Education:</h5>
+                    {% if profile.educations %}
+                        <ul>
+                            {% for education in profile.educations %}
+                                <li>{{ education.degree }} from {{ education.institution }} ({{ education.start_date|date:'Y-m-d' }} - {{ education.end_date|date:'Y-m-d'|default:'Present' }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                    <h5>Certifications:</h5>
+                    {% if profile.certifications %}
+                        <ul>
+                            {% for certification in profile.certifications %}
+                                <li>{{ certification.title }} by {{ certification.issuing_organization }} ({{ certification.issue_date|date:'Y-m-d' }} - {{ certification.expiration_date|date:'Y-m-d'|default:'No Expiry' }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

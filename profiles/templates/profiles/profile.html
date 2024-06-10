@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="basicInfo-tab" data-toggle="tab" href="#basicInfo" role="tab" aria-controls="basicInfo" aria-selected="true">Basic Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="otherInfo-tab" data-toggle="tab" href="#otherInfo" role="tab" aria-controls="otherInfo" aria-selected="false">Other Info</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="profileTabsContent">
+                        <div class="tab-pane fade show active" id="basicInfo" role="tabpanel" aria-labelledby="basicInfo-tab">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" {% if profile.email_updated %}disabled{% endif %}>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ profile.date_of_birth|date:'Y-m-d' }}" placeholder="YYYY-MM-DD">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Gender</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="gender-male" value="Male" {% if profile.gender == 'Male' %}checked{% endif %}>
+                                        <label class="form-check-label" for="gender-male">Male</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="gender-female" value="Female" {% if profile.gender == 'Female' %}checked{% endif %}>
+                                        <label class="form-check-label" for="gender-female">Female</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="gender-other" value="Other" {% if profile.gender == 'Other' %}checked{% endif %}>
+                                        <label class="form-check-label" for="gender-other">Other</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address">{{ profile.address }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ profile.phone_number }}" placeholder="e.g., +1 123 456 7890" pattern="[+]?[0-9\s]+">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="Bio">{{ profile.bio }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profile_picture" class="form-label">Profile Picture</label>
+                                    {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-thumbnail mb-2" style="max-width: 200px;">
+                                    {% endif %}
+                                    <input type="file" class="form-control" id="profile_picture" name="profile_picture">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="skills" class="form-label">Skills</label>
+                                    <input type="text" class="form-control" id="skills" name="skills" value="{{ skills|join:', ' }}" placeholder="Skills (separated by commas)">
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                           
+                        </div>
+                        <div class="tab-pane fade" id="otherInfo" role="tabpanel" aria-labelledby="otherInfo-tab">
+                           
+                                {% csrf_token %}
+                                <h5>Projects</h5>
+                                {% for project in projects %}
+                                <input type="hidden" name="project_id" value="{{ project.id }}">
+                                <div class="mb-3">
+                                    <label for="project_{{ project.id }}" class="form-label">Project Title</label>
+                                    <input type="text" class="form-control" id="project_{{ project.id }}" name="project_title" value="{{ project.title }}">
+                                    <textarea class="form-control" id="project_desc_{{ project.id }}" name="project_description" rows="3" placeholder="Project Description">{{ project.description }}</textarea>
+                                    <div class="mb-3">
+                                        <label for="project_image_{{ project.id }}" class="form-label">Project Image</label>
+                                        {% if project.image %}
+                                        <img src="{{ project.image.url }}" alt="Project Image" class="img-thumbnail mb-2" style="max-width: 200px;">
+                                        {% endif %}
+                                        <input type="file" class="form-control" id="project_image_{{ project.id }}" name="project_image" accept="image/*">
+                                    </div>
+                                    <input type="url" class="form-control" id="project_link_{{ project.id }}" name="project_link" value="{{ project.link }}" placeholder="Project Link">
+                                </div>
+                                {% endfor %}
+                                <div class="mb-3">
+                                    <label for="new_project" class="form-label">Add New Project</label>
+                                    <input type="hidden" name="project_id" value="">
+                                    <input type="text" class="form-control" id="new_project" name="project_title" placeholder="Project Title">
+                                    <textarea class="form-control" id="new_project_desc" name="project_description" rows="3" placeholder="Project Description"></textarea>
+                                    <div class="mb-3">
+                                        <label for="new_project_image" class="form-label">Project Image</label>
+                                        <input type="file" class="form-control" id="new_project_image" name="project_image" accept="image/*">
+                                    </div>
+                                    <input type="url" class="form-control" id="new_project_link" name="project_link" placeholder="Project Link">
+                                </div>
+
+                                <h5>Work Experience</h5>
+                                {% for work_experience in work_experiences %}
+                                <input type="hidden" name="work_experience_id" value="{{ work_experience.id }}">
+                                <div class="mb-3">
+                                    <label for="work_experience_{{ work_experience.id }}" class="form-label">Position</label>
+                                    <input type="text" class="form-control" id="work_experience_{{ work_experience.id }}" name="work_experience_position" value="{{ work_experience.position }}" placeholder="Position">
+                                    <textarea class="form-control" id="work_experience_desc_{{ work_experience.id }}" name="work_experience_description" rows="3" placeholder="Work Experience Description">{{ work_experience.description }}</textarea>
+                                    <input type="text" class="form-control" id="work_experience_company_{{ work_experience.id }}" name="work_experience_company" value="{{ work_experience.company }}" placeholder="Company">
+                                    <input type="date" class="form-control" id="work_experience_start_{{ work_experience.id }}" name="work_experience_start_date" value="{{ work_experience.start_date|date:'Y-m-d' }}" placeholder="Start Date">
+                                    <input type="date" class="form-control" id="work_experience_end_{{ work_experience.id }}" name="work_experience_end_date" value="{{ work_experience.end_date|date:'Y-m-d' }}" placeholder="End Date">
+                                </div>
+                                {% endfor %}
+                                <div class="mb-3">
+                                    <label for="new_work_experience" class="form-label">Add New Work Experience</label>
+                                    <input type="hidden" name="work_experience_id" value="">
+                                    <input type="text" class="form-control" id="new_work_experience" name="work_experience_position" placeholder="Position">
+                                    <textarea class="form-control" id="new_work_experience_desc" name="work_experience_description" rows="3" placeholder="Work Experience Description"></textarea>
+                                    <input type="text" class="form-control" id="new_work_experience_company" name="work_experience_company" placeholder="Company">
+                                    <input type="date" class="form-control" id="new_work_experience_start" name="work_experience_start_date" placeholder="Start Date">
+                                    <input type="date" class="form-control" id="new_work_experience_end" name="work_experience_end_date" placeholder="End Date">
+                                </div>
+
+                                <h5>Education</h5>
+                                {% for education in educations %}
+                                <input type="hidden" name="education_id" value="{{ education.id }}">
+                                <div class="mb-3">
+                                    <label for="education_{{ education.id }}" class="form-label">Degree</label>
+                                    <input type="text" class="form-control" id="education_{{ education.id }}" name="education_degree" value="{{ education.degree }}" placeholder="Degree">
+                                    <textarea class="form-control" id="education_desc_{{ education.id }}" name="education_description" rows="3" placeholder="Education Description">{{ education.description }}</textarea>
+                                    <input type="text" class="form-control" id="education_institution_{{ education.id }}" name="education_institution" value="{{ education.institution }}" placeholder="Institution">
+                                    <input type="date" class="form-control" id="education_start_{{ education.id }}" name="education_start_date" value="{{ education.start_date|date:'Y-m-d' }}" placeholder="Start Date">
+                                    <input type="date" class="form-control" id="education_end_{{ education.id }}" name="education_end_date" value="{{ education.end_date|date:'Y-m-d' }}" placeholder="End Date">
+                                </div>
+                                {% endfor %}
+                                <div class="mb-3">
+                                    <label for="new_education" class="form-label">Add New Education</label>
+                                    <input type="hidden" name="education_id" value="">
+                                    <input type="text" class="form-control" id="new_education" name="education_degree" placeholder="Degree">
+                                    <textarea class="form-control" id="new_education_desc" name="education_description" rows="3" placeholder="Education Description"></textarea>
+                                    <input type="text" class="form-control" id="new_education_institution" name="education_institution" placeholder="Institution">
+                                    <input type="date" class="form-control" id="new_education_start" name="education_start_date" placeholder="Start Date">
+                                    <input type="date" class="form-control" id="new_education_end" name="education_end_date" placeholder="End Date">
+                                </div>
+
+                                <h5>Certifications</h5>
+                                {% for certification in certifications %}
+                                <input type="hidden" name="certification_id" value="{{ certification.id }}">
+                                <div class="mb-3">
+                                    <label for="certification_{{ certification.id }}" class="form-label">Certification Title</label>
+                                    <input type="text" class="form-control" id="certification_{{ certification.id }}" name="certification_title" value="{{ certification.title }}" placeholder="Title">
+                                    <textarea class="form-control" id="certification_desc_{{ certification.id }}" name="certification_description" rows="3" placeholder="Certification Description">{{ certification.description }}</textarea>
+                                    <input type="text" class="form-control" id="certification_organization_{{ certification.id }}" name="certification_organization" value="{{ certification.issuing_organization }}" placeholder="Issuing Organization">
+                                    <input type="date" class="form-control" id="certification_issue_{{ certification.id }}" name="certification_issue_date" value="{{ certification.issue_date|date:'Y-m-d' }}" placeholder="Issue Date">
+                                    <input type="date" class="form-control" id="certification_expiry_{{ certification.id }}" name="certification_expiry_date" value="{{ certification.expiration_date|date:'Y-m-d' }}" placeholder="Expiry Date">
+                                </div>
+                                {% endfor %}
+                                <div class="mb-3">
+                                    <label for="new_certification" class="form-label">Add New Certification</label>
+                                    <input type="hidden" name="certification_id" value="">
+                                    <input type="text" class="form-control" id="new_certification" name="certification_title" placeholder="Title">
+                                    <textarea class="form-control" id="new_certification_desc" name="certification_description" rows="3" placeholder="Certification Description"></textarea>
+                                    <input type="text" class="form-control" id="new_certification_organization" name="certification_organization" placeholder="Issuing Organization">
+                                    <input type="date" class="form-control" id="new_certification_issue" name="certification_issue_date" placeholder="Issue Date">
+                                    <input type="date" class="form-control" id="new_certification_expiry" name="certification_expiry_date" placeholder="Expiry Date">
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
